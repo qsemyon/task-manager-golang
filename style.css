@@ -1,0 +1,83 @@
+:root {
+    --bg: #0d0d0d;
+    --card-bg: #141414;
+    --red: #ff3e3e;
+    --white: #ffffff;
+    --gray: #212121;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.todo-card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card-bg);
+    padding: 40px;
+    border: 1px solid var(--red);
+    border-radius: 12px;
+}
+
+h1 { text-align: center; margin-bottom: 30px; text-transform: uppercase; }
+
+.input-wrapper { display: flex; gap: 10px; margin-bottom: 30px; }
+
+input {
+    flex: 1;
+    background: var(--gray);
+    border: 1px solid #333;
+    padding: 14px;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+}
+
+input:focus { border-color: var(--red); }
+
+.add-button {
+    background: var(--red);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--gray);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.task-text { flex: 1; cursor: pointer; }
+
+.delete-btn {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-btn:hover { background: var(--red); color: white; }
