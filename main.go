@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -20,43 +21,58 @@ type Task struct {
 }
 
 func main() {
-	initDatabase()
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		dbUser, dbPass, dbHost, dbPort, dbName)
+
+	initDatabase(connStr)
 	defer db.Close()
 
 	http.HandleFunc("/tasks", tasksHandler)
+	http.Handle("/", http.FileServer(http.Dir("./static")))
 
-	http.Handle("/", http.FileServer(http.Dir(".")))
+	appPort := os.Getenv("APP_PORT")
+	if appPort == "" {
+		appPort = "8080"
+	}
 
-	fmt.Println("Сервер запущен на http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Printf("Сервер запущен на http://localhost:%s\n", appPort)
+	log.Fatal(http.ListenAndServe(":"+appPort, nil))
 }
 
-func initDatabase() {
+func initDatabase(connStr string) {
 	var err error
-	connStr := "postgres://postgres:mysecretpassword@db:5432/postgres?sslmode=disable"
 
 	for i := 1; i <= 15; i++ {
 		db, err = sql.Open("postgres", connStr)
 		if err == nil {
 			err = db.Ping()
 		}
+
 		if err == nil {
-			fmt.Println("Подключение к БД успешно")
+			fmt.Println("Успешное подключение к базе данных!")
 			break
 		}
+
 		fmt.Printf("[Попытка %d] База еще не готова, ждем...\n", i)
 		time.Sleep(2 * time.Second)
 	}
 
 	if err != nil {
-		log.Fatal("Ошибка подключения к БД:", err)
+		log.Fatal("Не удалось подключиться к БД после 15 попыток:", err)
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS tasks (
-		id SERIAL PRIMARY KEY, 
-		title TEXT NOT NULL, 
-		done BOOLEAN DEFAULT FALSE
-	)`)
+	query := `CREATE TABLE IF NOT EXISTS tasks (
+        id SERIAL PRIMARY KEY, 
+        title TEXT NOT NULL, 
+        done BOOLEAN DEFAULT FALSE
+    )`
+	_, err = db.Exec(query)
 	if err != nil {
 		log.Fatal("Ошибка создания таблицы:", err)
 	}
