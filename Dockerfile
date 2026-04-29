@@ -1,15 +1,23 @@
-FROM golang:1.21-alpine
-
+FROM node:20-alpine AS frontend-builder
 WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
 
+FROM golang:1.26-alpine AS backend-builder
+WORKDIR /app
 COPY go.mod go.sum ./
-
 RUN go mod download
-
 COPY . .
 
+COPY --from=frontend-builder /static ./static
 RUN go build -o main .
 
-EXPOSE 8080
+FROM alpine:latest
+WORKDIR /root/
+COPY --from=backend-builder /app/main .
+COPY --from=backend-builder /app/static ./static
 
+EXPOSE 8080
 CMD ["./main"]
