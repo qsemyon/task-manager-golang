@@ -1,0 +1,9 @@
+node_modules
+static
+frontend/dist
+.env
+.git
+.vscode
+.idea
+*.png
+main
