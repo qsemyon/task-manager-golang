@@ -1,4 +1,4 @@
-module github.com/qsemyon/task-manager-golang
+module task-manager
 
 go 1.26.1
 
