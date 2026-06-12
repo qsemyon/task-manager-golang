@@ -10,10 +10,19 @@ const taskInput = document.getElementById('taskInput') as HTMLInputElement;
 const addBtn = document.getElementById('addBtn') as HTMLButtonElement;
 const taskList = document.getElementById('taskList') as HTMLDivElement;
 
+const escapeHTML = (str: string): string => {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 const createTaskTemplate = (task: Task): string => `
     <div class="task-item ${task.done ? 'completed' : ''}">
         <span class="task-text" data-id="${task.id}" data-done="${task.done}">
-            ${task.title}
+            ${escapeHTML(task.title)}
         </span>
         <button class="delete-btn" data-id="${task.id}">Удалить</button>
     </div>
